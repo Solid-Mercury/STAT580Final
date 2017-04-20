@@ -37,12 +37,15 @@ incomp.sim <- function(m,n,rank,SNR,p){
   lrm <- lrm.gen(m,n,rank)
   
   # add noise
-  incomp <- add_noise(lrm, SNR)
+  lrm_with_noise <- add_noise(lrm, SNR)
+  
+  # omega
+  omega <- obs.gen(incomp, p)
   
   #remove
-  incomp <- set_NA(incomp, obs.gen(incomp, p))
+  incomp <- set_NA(lrm_with_noise, omega)
   
-  res <- list(incomp <- incomp, true = lrm)
+  res <- list(incomp <- incomp, true = lrm, true_wth_noise = lrm_with_noise, omega = omega)
   return(res)
 }
 
