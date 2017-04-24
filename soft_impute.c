@@ -1,6 +1,7 @@
 #include <stdio.h>
-#define M 10
-#define N 10
+#include <stdlib.h>
+#include <assert.h>
+
 
 void dgesvd_(char *JOBU, char *JOBVT, int *M, int *N, double *A, int *LDA, double *S, double *U, int *LDU, double *VT, int *LDVT, double *WORK, int *LWORK, int *INFO);
 
@@ -61,7 +62,7 @@ void soft_threshold(double *s, double lambda, int r){
 void P_omega_c(double *zold, double *P_omega_c_zold, double *omega, int m, int n){
 	int i;
 	for (i= 0; i < m*n; i++)
-		P_omega_c_zold[i] = omega[i] * zold[i];
+		P_omega_c_zold[i] = (1 - omega[i]) * zold[i];
 }
 
 void get_znew(double *znew, double *z, double *zold, double *omega, double lambda, int m, int n){
@@ -142,7 +143,8 @@ void soft_impute(double *zhat, double *z, double *zold, double *omega, double la
 
 
 int main(){
-double Z_missing[M][N] =
+    int M = 10, N = 10;
+double Z_missing[10][10] =
 {{0,-2.08,-1.67,-0.48,-0.52,-1.37,0.47,0.57,-0.2,-0.37},
 {1.77,0,0.72,0,0,2.22,0.99,0,-2.54,3.76},
 {-7.45,0,2.93,0,-0.68,0,-4.64,4.84,0,-7.13},
@@ -154,7 +156,7 @@ double Z_missing[M][N] =
 {0,0,0,-0.85,2.99,0,6.29,0,-1.53,6},
 {2.16,0,0,-1.22,0,0,-1.05,0,0,0}};
 
-double omega[M][N] = 
+double Omega[10][10] = 
 {{0,1,1,1,1,1,1,1,1,1},
 {1,0,1,0,0,1,1,0,1,1},
 {1,0,1,0,1,0,1,1,0,1},
@@ -166,7 +168,7 @@ double omega[M][N] =
 {0,0,0,1,1,0,1,0,1,1},
 {1,0,0,1,0,0,1,0,0,0}};
 
-double Z_true[M][N] =
+double Z_true[10][10] =
 {{1.61,-2.08,-1.65,-0.48,-0.5,-1.36,0.49,0.58,-0.15,-0.42},
 {1.79,4.1,0.69,-1.55,0.68,2.21,0.98,-2.93,-2.56,3.74},
 {-7.43,-2.38,2.96,4.18,-0.71,-0.72,-4.64,4.82,5.29,-7.11},
@@ -179,18 +181,20 @@ double Z_true[M][N] =
 {2.13,1.53,-0.42,-1.23,-0.75,0.63,-1.06,-0.55,-1.62,0.73}};
 
 double lambda[10];
-
-// Let lambda be 1:100
+int i,j,k;
+// Let lambda 
 for (i=0; i<10; i++){
-	lambda[i] = i+1;
+	lambda[i] = 0.1*i + 0.1;
 }
 
 double z[M*N];
 double zold[M*N];
 double zhat[M*N];
+double ztrue[M*N];
+double omega[M*N];
 //double res[M][N][10];
-double error[10];
-int i,j,k;
+//double error[10];
+
 
 // Initialize zold as all zero
 for (i=0; i<M; i++){
@@ -199,36 +203,27 @@ for (i=0; i<M; i++){
 	}
 }
 
-// Initialize z as Z_missing, transpose for input
+// Initialize z as Z_missing, transpose for input, also transpose Z_true and save it as ztrue
 for (i=0; i<M; i++){
 	for (j=0; j<N; j++){
-		zold[i + M*j] = Z_missing[i][j];
+		z[i + M*j] = Z_missing[i][j];
+        ztrue[i + M*j] = Z_true[i][j];
+        omega[i + M*j] = Omega[i][j];
 	}
 }
 
 
 for (k = 0; k < 10; k++){
-	soft_impute(zhat, z, zold, &(omega[0][0]), lambda[k], M, N);
+	soft_impute(zhat, z, zold, omega, lambda[k], M, N);
 
-	for (i = 0; i < M; i++){
-		for (j = 0; j < M; j++){
-			//res[i][j][k] = zhat[i + M*j];
-			error[k] = diff(zhat, &(Z_true[0][0]), M, N);
-			printf("%f\n", error[k]);
-		}
-		}
-	
+	//error[k] = diff(zhat, ztrue, M, N);	
+    printf("%f\n", diff(ztrue, zhat, M, N));
+		
 
 	for (i=0; i<M*N; i++){
 		zold[i] = zhat[i];
 	}
 }
-
-
-
-
-
-	
 
 return 0;
 }
