@@ -1,8 +1,19 @@
 ##########################################################
 #####        functions to do comparison      #############
-#function to find test error
-testerror <- function(uv,zhat){
-  res<-sum((uv-zhat)^2)
+##########################################################
+#####        functions to do comparison      #############
+#function to find test error. Compare over the rest 40% of image, which is not taken as data.
+testerror <- function(uv,zhat,omega){
+  resnum <- (norm((uv-zhat)*(1-omega), type = "F"))^2
+  resden <- (norm(uv*(1-omega), type = "F"))^2
+  res <- resnum/resden
+  return(res)
+}
+#function to find training error. Compare over validation set.
+trainingerror <- function(z,zhat,omega){
+  resnum <- (norm((z-zhat)*omega, type = "F"))^2
+  resden <- (norm(z*omega, type = "F"))^2
+  res <- resnum/resden
   return(res)
 }
 
@@ -10,31 +21,31 @@ testerror <- function(uv,zhat){
 ############ original svd in R##############################
 #a) R interval svd function
 z_new_r_svd<-function(z,z_old,lambda){
-	r_zero<-row(z)[which(z!=0)]
-	c_zero<-col(z)[which(z!=0)]
-	z_old[cbind(r_zero,c_zero)]<-0
-	p<-z+z_old
-	s<-svd(p)
-	D<-diag(s$d)
-	U<-(s$u)
-	V<-(s$v)
-	D<-D-lambda*diag(length(s$d))
-	D[D<0]<-0
-	z_new<-U%*%D%*%t(V)
-	return (z_new)
+  r_zero<-row(z)[which(z!=0)]
+  c_zero<-col(z)[which(z!=0)]
+  z_old[cbind(r_zero,c_zero)]<-0
+  p<-z+z_old
+  s<-svd(p)
+  D<-diag(s$d)
+  U<-(s$u)
+  V<-(s$v)
+  D<-D-lambda*diag(length(s$d))
+  D[D<0]<-0
+  z_new<-U%*%D%*%t(V)
+  return (z_new)
 }
 r_svd<-function(z,lambda){
- z_hat<-array(rep(0,nrow(z)*ncol(z)*length(lambda)),dim=c(nrow(z),ncol(z),length(lambda)))
- z_old<-matrix(rep(0,nrow(z)*ncol(z)),nrow=nrow(z))
-for (i in 1:length(lambda)){
-		z_new<-z_new_r_svd(z,z_old,lambda[i])
-	diff=1
-	while(diff>10^-5){
-		z_old<-z_new
-		z_new<-z_new_r_svd(z,z_old,lambda[i])
-		diff<-sum((z_new-z_old)^2)/(sum(z_old^2))	}
-z_hat[,,i]<-z_new}
-return (z_hat)
+  z_hat<-array(rep(0,nrow(z)*ncol(z)*length(lambda)),dim=c(nrow(z),ncol(z),length(lambda)))
+  z_old<-matrix(rep(0,nrow(z)*ncol(z)),nrow=nrow(z))
+  for (i in 1:length(lambda)){
+    z_new<-z_new_r_svd(z,z_old,lambda[i])
+    diff=1
+    while(diff>10^-5){
+      z_old<-z_new
+      z_new<-z_new_r_svd(z,z_old,lambda[i])
+      diff<-sum((z_new-z_old)^2)/(sum(z_old^2))	}
+    z_hat[,,i]<-z_new}
+  return (z_hat)
 }
 
 
@@ -70,20 +81,30 @@ lena_training_hat<-array(rep(0,nrow(lena_training)*ncol(lena_training)*length(la
 lena_training_error<-rep(0,length(lambda))
 
 for (i in 1:length(lambda)){
-	lena_training_hat[,,i]<-r_svd(lena_training,lambda[i])
-	lena_training_error[i]<-testerror(lena_validation* lena_validation_omega,lena_training_hat[,,i]* lena_validation_omega)
-	
+  lena_training_hat[,,i]<-r_svd(lena_training,lambda[i])
+  lena_training_error[i]<-trainingerror(lena_validation,lena_training_hat[,,i], lena_validation_omega)
+  
 }
 best_lambda<-lambda[which.min(lena_training_error)]
 best_lambda
 #190
 min(lena_training_error)
-#6,817,448
+#0.04585135
 lena_test_hat<-r_svd(lena_test,best_lambda)[,,1]
 
-lena_validation_error<-testerror(lena,lena_test_hat)
-lena_validation_error
-#14,682,731
+lena_test_error<-testerror(lena,lena_test_hat,lena_test_omega)
+lena_test_error
+#0.03104175
+library(Matrix)
+rankMatrix(lena)
+rankMatrix(lena_test_hat)
+#original image
+image(lena[256:1,256:1],col = grey(seq(0, 1, length = 256)))
 
+#before pic amendment
+image(lena_test[256:1,256:1],col = grey(seq(0, 1, length = 256)))
+
+#after pic amendment
+image(lena_test_hat[256:1,256:1],col = grey(seq(0, 1, length = 256)))
 
 
