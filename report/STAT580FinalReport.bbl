@@ -1,0 +1,14 @@
+\begin{thebibliography}{1}
+
+\bibitem{hastie2015statistical}
+Trevor Hastie, Robert Tibshirani, and Martin Wainwright.
+\newblock {\em Statistical learning with sparsity}.
+\newblock CRC press, 2015.
+
+\bibitem{mazumder2010spectral}
+Rahul Mazumder, Trevor Hastie, and Robert Tibshirani.
+\newblock Spectral regularization algorithms for learning large incomplete
+  matrices.
+\newblock {\em Journal of machine learning research}, 11(Aug):2287--2322, 2010.
+
+\end{thebibliography}
