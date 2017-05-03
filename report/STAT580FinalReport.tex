@@ -15,6 +15,7 @@
 	\usepackage{algorithm}
 	\usepackage{algpseudocode}
 	\usepackage{subfigure}
+	\usepackage{appendix}
 	\lstset{
 	basicstyle = \small\tt,
 	keywordstyle = \ttfamily\bfseries\color{blue},
@@ -60,7 +61,7 @@ The SVD provides a solution to the rank-q matrix matrix approximation problem. T
 
 It has a closed form solution $\widehat{\mathbf{Z}}_r = UD_rV^T$. It's sparse in the sense that all but r singular values are 0 and it provides an effective method for matrix completion.
 
-Suppose our observed entries of the matrix $\mathbf{Z}$ indexed by the subset $\Omega \subset {1,\cdots,m}\times {1,\cdots,n}$. A natural approach is to seek the lowest rank approximating matrix $\widehat{\mathbf{Z}}$.
+Suppose our observed entries of the matrix $\mathbf{Z}$ indexed by the subset $\Omega \subset \{1,\cdots,m\}\times \{1,\cdots,n\}$. A natural approach is to seek the lowest rank approximating matrix $\widehat{\mathbf{Z}}$.
 But forcing the estimate $\mathbf{M}$ to interpolate each of the observed entries $z_{ij}$ will be too harsh and can lead to overfitting. So it would be better to allow some errors. Consider the optimization problem:
 
 \begin{equation}\label{errorversion}
@@ -80,7 +81,7 @@ Then we can use Soft-Impute Algorithm to solve this problem.
 		\begin{algorithmic}[1]
 			\State Initialize $Z^{\mathrm{old}} = 0$ and create a decreasing grid $\lambda_1>\cdots > \lambda_n$
 			\For {each $k=1,\cdots , K,$ set $\lambda = \lambda_k$ and iterate until convergence:}
-			\State {Compute $\widehat{\mathbf{Z}}_{\lambda}\leftarrow S_{\lambda}(P_{\Omega}(\mathbf{Z} + P_{\Omega}^{\perp}(Z^{\mathrm{old}})))$.}
+			\State {Compute $\widehat{\mathbf{Z}}_{\lambda}\leftarrow S_{\lambda}(P_{\Omega}(\mathbf{Z} )+ P_{\Omega}^{\perp}(Z^{\mathrm{old}}))$.}
             \State {Update $Z^{\mathrm{old}} \leftarrow \widehat{\mathbf{Z}}_{\lambda}$}
 			\EndFor
             \State {Output the sequence of solutions $\widehat{\mathbf{Z}}_{\lambda_1},\cdots,\widehat{\mathbf{Z}}_{\lambda_K}$.}
@@ -139,6 +140,8 @@ Then we tried different properties of the generated matrix. Let $p = 0.3,0.5,0.8
 
 \begin{table}[!htp]
 \centering
+\caption{Performance of different methods for different problem instances in terms of test error and running time}
+\vspace{0.5em}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
 time1&time2&time3&time4&error1&error2&error3&error4&true rank&SNR&$p$\\
@@ -180,7 +183,6 @@ time1&time2&time3&time4&error1&error2&error3&error4&true rank&SNR&$p$\\
 4.6070&4.5803&2.4109&3.6193&0.8458&0.8458&0.8458&0.8458&20&10&0.8\\
 \hline
 \end{tabular}
-\caption{Performance of different methods for different problem instances, in terms of test error and running time.}
 \end{table}
 
 This table shows that the minimum test errors among the 4 methods are quite similar, but the running time of method \verb|irlba package| is the shortest followed by \verb|rcpparmadillo|.
@@ -189,7 +191,7 @@ According to the comparison above, we'll use the method \verb|irlba package| in 
 
 	\section{Application}
 	\subsection{Lena}
-	Based the comparison between these 4 implementations, we choose the \verb|original svd| in R to do the image imputing. The reason is that from {\color{red}Figure} we can see the \verb|original svd| and \verb|rcpparmadillo| seems to be more steady than \verb|irlba| (the gray region that represents confidence interval is smaller). Also these two methods seems to have smaller test error around the true matrix rank. Because the data for lena is not large, thus we do not care about the speed of implementations. And we can expect \verb|original svd| and \verb|rcpparmadillo| would give almost the same results from the comparison part, hence we choose to use \verb|orginal svd|. 
+	Based the comparison between these 4 implementations, we choose the \verb|original svd| in R to do the image imputing. The reason is that from {Figure} \ref{comparison_testerror} we can see the \verb|original svd| and \verb|rcpparmadillo| seems to be more steady than \verb|irlba package| (the gray region that represents confidence interval is smaller). Also these two methods seems to have smaller test error around the true matrix rank. Because the data for lena is not large, thus we do not care about the speed of implementations. And we can expect \verb|original svd| and \verb|rcpparmadillo| would give almost the same results from the comparison part, hence we choose to use \verb|orginal svd|. 
 
 	First we randomly removed the 40\% of the lena and got an image with only 60\% being observed. Now we use the 60\% as our data to restore the image with soft-impute. In order to obtain an optimal restoration, we need to tune the parameter $\lambda$ in the soft-impute algorithm. The strategy we took is to further divide the data into two parts: 70\% as training data and 30\% as validation data. We did the imputation with a series of $\lambda$'s (we used $\lambda = 500, 490, \ldots, 10$). Then we compared the corresponding validation part of these imputed matrix with the true validation set. The error term we used is
 	\begin{equation}\label{valid_error}
@@ -241,20 +243,100 @@ According to the comparison above, we'll use the method \verb|irlba package| in 
 	\textrm{RMSE} = \sqrt{\frac{\|P_{\Omega_{\rm test}}(Z_{\rm true} - \hat{Z}_{\lambda_{\rm opt}})\|_{F}^2}{|\Omega_{\rm test}|}}
 	\end{equation}
 
-	As the dataset is pretty big, we chose \verb|irlba| and \verb|rcpparmadillo| as two implementations to be applied to this dataset. There two implementations are relatively faster than others ,thus with the big dataset we could save a lot of time. 
+	As the dataset is pretty big, we chose \verb|irlba package| and \verb|rcpparmadillo| as two implementations to be applied to this dataset. There two implementations are relatively faster than others ,thus with the big dataset we could save a lot of time. 
 
 	In choosing the optimal $\lambda$, as the big matrix takes time to impute, we used a strategy to find the optimal one using 3 grids of $\lambda$'s by assuming the test error as a function of $\lambda$ is unimodal. The first grid is $\lambda = 100, 90, \ldots, 10$ with step size 10. From this grid we can find the interval where the optimal $\lambda$ located. We found $\lambda  = 10$ was the smallest in this grid. Then we knew the optimal $\lambda$ is between $20$ and $0$. Then we used the second grid $\lambda = 19, 16, \ldots, 4, 1$ with step size 3. We found $\lambda = 13$ is the smallest in this grid. Then we tried the third grid $\lambda = 15, 14, 12, 11$. In this grid, $\lambda = 12$ gave us the smallest test error. But comparing it with the test error when $\lambda = 13$, we found the test error for $\lambda =13$ was smaller. Hence, the optimal $\lambda$ we chose is $\lambda = 13$. 
 
+	The time it took in each $\lambda$ grid, the best $\lambda$ for that grid and the corresponding validation error for that best $\lambda$ for both methods are given below.
 
+	\begin{table}[!htb]
+	\centering
+	\caption{Time, best $\lambda$, validation error for two methods in three grids}
+	\vspace{0.5em}
+	\label{3grids}
+		\begin{tabular}{|l|l|l|l|l|}
+\hline
+                                   & method               & time      & best $\lambda$ & validation error \\ \hline
+\multirow{2}{*}{$1_{\rm st}$ grid} & \verb|irlba package| & 6278.067  & 10             & 0.07842399       \\ \cline{2-5} 
+                                   & \verb|rcpparmadillo| & 43121.128 & 10             & 0.07840086       \\ \hline
+\multirow{2}{*}{$2_{\rm nd}$ grid} & \verb|irlba package| & 12487.161 & 13             & 0.07705321       \\ \cline{2-5} 
+                                   & \verb|rcpparmadillo| & 35947.462 & 13             & 0.07707266       \\ \hline
+\multirow{2}{*}{$3_{\rm rd}$ grid} & \verb|irlba package| & 3673.131  & 12             & 0.07710168       \\ \cline{2-5} 
+                                   & \verb|rcpparmadillo| & 20142.322 & 12            & 0.07715054       \\ \hline
+\end{tabular}
+	\end{table}
 
+	From Table \ref{3grids}, we can see the method \verb|irlba  package| is a lot faster. However the best $\lambda$ and validation error they got for each grid are almost the same.
 
+	Using the optimal $\lambda = 13$, we obtained the imputed matrix and compare the corresponding test set entries in the matrix with test set. The test error and RMSE we got is shown below.
+	\begin{table}[!htb]
+	\centering
+		\caption{Test error and RMSE with respect to two methods}
+		\vspace{0.5em}
+		\begin{tabular}{|l|l|l|l|l|}
+		\hline
+			& optimal $\lambda$ & test error & RMSE \\ \hline
+		\verb|irlba package| & 13 & 0.07705321 & 1.0283 \\ \hline
+		\verb|rcpparmadillo| & 13 & 0.07707266 & 1.0284 \\ \hline
+		\end{tabular}
+	\end{table}
 
-	
+	The two methods gave almost the same test error and RMSE, thus the major difference between is the speed. In the case of large dataset, \verb|irlba package| is much more efficient.
 
 	\newpage
 
 	\bibliographystyle{unsrt}
 	\bibliography{reference}
+
+	\newpage
+
+	\begin{appendices}
+	\section{Appendix: Codes for final project}
+
+	C LAPACK soft-impute implementation:
+
+	\lstinputlisting[language = C]{../soft_impute.c}
+	\end{appendices}
+
+	C part for RCpp Armadillo implementation:
+
+	\lstinputlisting[language = C]{../armadillo_svd.cpp}
+
+	All functions used in comparison and application part, includin four implementations of soft-impute:
+
+	\lstinputlisting[language = R]{../fpfunctions2.R}
+
+	Plot part of comparison:
+
+	\lstinputlisting[language = R]{../comparison_graph.R}
+
+	Table part of comparison:
+
+	\lstinputlisting[language = R]{../comparison_test.R}
+
+	Lena:
+
+	\lstinputlisting[language = R]{../lena_comparison.R}
+
+	The first grid part of $\lambda$ selection in MovieLens ($\lambda = 100, 90, \ldots, 10$):
+
+	Using \verb|irlba package|
+
+	\lstinputlisting[language = R]{../movie_comparison_irlba_server.R}
+
+	Using \verb|rcpparmadillo|
+	
+	\lstinputlisting[language = R]{../movie_c_cpp_server.R}
+
+	Imputing matrix using optimal $\lambda$ and getting test error and RMSE:
+
+	\lstinputlisting[language = R]{../impute_using_optimal_lambda.R}
+
+	\lstinputlisting[language = R]{../RMSE.R}
+
+
+
+
 
 	
 	\end{document}
