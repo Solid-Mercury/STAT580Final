@@ -112,13 +112,9 @@ best_lambda<-unlist(l[1])
 
 min_td_error<-unlist(l[2])
 
-m_test_hat<-irlba_svd(m_test,best_lambda)[,,1]
-
-m_error<-trainingerror(m_validation2,m_test_hat,m_validation2_omega)
-
-o<-list(t,best_lambda,m_error)
+o<-list(t,best_lambda,min_td_error)
 save(o, file = "m_irlba100_10.Rda" )
-save(m_test_hat,file="m_test_hat.Rda")
+
 
 
 
