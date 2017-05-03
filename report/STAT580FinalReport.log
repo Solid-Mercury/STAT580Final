@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/W32TeX) (preloaded format=pdflatex 2017.2.27)  2 MAY 2017 17:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/W32TeX) (preloaded format=pdflatex 2017.2.27)  2 MAY 2017 19:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -487,58 +487,93 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 45.
 
 (c:/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 53.
-
-(c:/texlive/2016/texmf-dist/tex/latex/psnfss/ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 ) [1
 
 {c:/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-<lena_true.jpg, id=16, 481.8pt x 481.8pt>
+<testerror.pdf, id=21, 614.295pt x 794.97pt>
+File: testerror.pdf Graphic file (type pdf)
+ <use testerror.pdf>
+Package pdftex.def Info: testerror.pdf used on input line 129.
+(pdftex.def)             Requested size: 193.50076pt x 250.41687pt.
+
+<trainingerror.pdf, id=22, 614.295pt x 794.97pt>
+File: trainingerror.pdf Graphic file (type pdf)
+ <use trainingerror.pdf>
+Package pdftex.def Info: trainingerror.pdf used on input line 132.
+(pdftex.def)             Requested size: 193.50076pt x 250.41687pt.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 136.
+
+
+(c:/texlive/2016/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+Overfull \hbox (9.80135pt too wide) in paragraph at lines 136--137
+[]\OT1/cmr/m/n/10 As we can see in the fig-ures, the soft-impute us-ing svd met
+h-ods []\OT1/pcr/m/n/10 original svd \OT1/cmr/m/n/10 and []\OT1/pcr/m/n/10 rcpp
+armadillo
+ []
+
+
+Overfull \hbox (18.54543pt too wide) in paragraph at lines 138--139
+[]\OT1/cmr/m/n/10 Then we tried dif-fer-ent prop-er-ties of the gen-er-ated ma-
+trix. Let $\OML/cmm/m/it/10 p \OT1/cmr/m/n/10 = 0\OML/cmm/m/it/10 :\OT1/cmr/m/n
+/10 3\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 5\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 8; [] = 1\OM
+L/cmm/m/it/10 ; \OT1/cmr/m/n/10 10; [] =
+ []
+
+[2] [3 <./testerror.pdf> <./trainingerror.pdf>] [4]
+<lena_true.jpg, id=52, 481.8pt x 481.8pt>
 File: lena_true.jpg Graphic file (type jpg)
  <use lena_true.jpg>
-Package pdftex.def Info: lena_true.jpg used on input line 83.
+Package pdftex.def Info: lena_true.jpg used on input line 222.
 (pdftex.def)             Requested size: 130.08621pt x 130.08038pt.
 
-<lena_data.jpg, id=17, 481.8pt x 481.8pt>
+<lena_data.jpg, id=53, 481.8pt x 481.8pt>
 File: lena_data.jpg Graphic file (type jpg)
  <use lena_data.jpg>
-Package pdftex.def Info: lena_data.jpg used on input line 87.
+Package pdftex.def Info: lena_data.jpg used on input line 226.
 (pdftex.def)             Requested size: 130.08621pt x 130.08038pt.
 
-<lena_restored.jpg, id=18, 481.8pt x 481.8pt>
+<lena_restored.jpg, id=54, 481.8pt x 481.8pt>
 File: lena_restored.jpg Graphic file (type jpg)
  <use lena_restored.jpg>
-Package pdftex.def Info: lena_restored.jpg used on input line 91.
+Package pdftex.def Info: lena_restored.jpg used on input line 230.
 (pdftex.def)             Requested size: 130.08621pt x 130.08038pt.
- [2 <./lena_true.jpg> <./lena_data.jpg> <./lena_restored.jpg>] [3]
-(./STAT580FinalReport.bbl) [4] (./STAT580FinalReport.aux) ) 
+ [5 <./lena_true.jpg> <./lena_data.jpg> <./lena_restored.jpg>] [6]
+(./STAT580FinalReport.bbl) [7] (./STAT580FinalReport.aux) ) 
 Here is how much of TeX's memory you used:
- 6124 strings out of 493013
- 84692 string characters out of 6136993
- 165743 words of memory out of 5000000
- 9528 multiletter control sequences out of 15000+600000
+ 6154 strings out of 493013
+ 85178 string characters out of 6136993
+ 176767 words of memory out of 5000000
+ 9556 multiletter control sequences out of 15000+600000
  17929 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 39i,8n,35p,1058b,271s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 39i,13n,35p,1058b,281s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/texlive/2016/tex
 mf-dist/fonts/enc/dvips/base/8r.enc}<c:/texlive/2016/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmbx12.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmex10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-mi10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><
-c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive
-/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2016/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/texlive/2016/texmf-dist/font
-s/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2016/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmr8.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti
-10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb><c
-:/texlive/2016/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on STAT580FinalReport.pdf (4 pages, 344293 bytes).
+lic/amsfonts/cm/cmbx10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmbx12.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+bx7.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
+c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texliv
+e/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb><c:/texlive/2016/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2016/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmr12.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmr5.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r7.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/
+texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2
+016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb><c:/texlive/2016/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><c:/texlive/2016/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmti10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmti12.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsf
+onts/symbols/msbm10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts
+/symbols/msbm7.pfb><c:/texlive/2016/texmf-dist/fonts/type1/urw/courier/ucrr8a.p
+fb>
+Output written on STAT580FinalReport.pdf (7 pages, 436101 bytes).
 PDF statistics:
- 73 PDF objects out of 1000 (max. 8388607)
- 50 compressed objects within 1 object stream
+ 130 PDF objects out of 1000 (max. 8388607)
+ 93 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

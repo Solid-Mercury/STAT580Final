@@ -45,9 +45,148 @@
 	\maketitle
 	
 	\section{Summary of Soft-Impute}
+First we want to fit a matrix $\widehat{\mathbf{Z}}$ that approximates $\mathbf{Z}$ in a suitable sense. By doing this, we can find an approximation that has simple structure or fill in any missing entries in $\mathbf{Z}$ which is our purpose.\cite{hastie2015statistical}
 
-	\cite{hastie2015statistical, mazumder2010spectral}
+Our general approach is to consider estimators based on optimization problem of the form:
+\begin{equation}\label{original}
+\widehat{\mathbf{Z}}= \arg \min_{\mathbf{M}\in \mathbb{R}^{m\times n}} \| \mathbf{Z} - \mathbf{M} \|^2_F \qquad \textrm{subject to} \qquad\Phi(\mathbf{M})\le c,
+\end{equation}
+$\Phi(\cdot)$ is a constraint function that encourages $\hat{\mathbf{Z}}$ to be sparse in some general sense. There are some kinds of constraint methods, one is the singular value decomposition that we'll discuss later.
+
+The SVD provides a solution to the rank-q matrix matrix approximation problem. Then our optimization problem (\ref{original}) has the form:
+\begin{equation}
+\arg\min_{rank(\mathbf{M}) = r} \| \mathbf{Z} - \mathbf{M} \|_F.
+\end{equation}
+
+It has a closed form solution $\widehat{\mathbf{Z}}_r = UD_rV^T$. It's sparse in the sense that all but r singular values are 0 and it provides an effective method for matrix completion.
+
+Suppose our observed entries of the matrix $\mathbf{Z}$ indexed by the subset $\Omega \subset {1,\cdots,m}\times {1,\cdots,n}$. A natural approach is to seek the lowest rank approximating matrix $\widehat{\mathbf{Z}}$.
+But forcing the estimate $\mathbf{M}$ to interpolate each of the observed entries $z_{ij}$ will be too harsh and can lead to overfitting. So it would be better to allow some errors. Consider the optimization problem:
+
+\begin{equation}\label{errorversion}
+\arg \min_{\mathrm{rank}(\mathbf{M})\le r} \sum_{(i,j) \in \Omega}(z_{ij} - m_{ij})^2.
+\end{equation}
+
+However, the optimization problem (\ref{errorversion}) is nonconvex, the exact solutions are in general not available. The nuclear norm is a convex relaxation of the rank of a matrix, so we can give a convex relaxation with noise:
+
+\begin{equation}
+\arg \min_{\mathbf{M}} \left\{ \frac{1}{2}\sum_{(ij) \in \Omega}(z_{ij}-m_{ij})^2 + \lambda \| \mathbf{M} \|_{\ast}  \right\}.
+\end{equation}
+
+Then we can use Soft-Impute Algorithm to solve this problem.
+
+	\begin{algorithm}
+		\caption{SOFT-IMPUTE FOR MATRIX COMPLETION\cite{mazumder2010spectral}}
+		\begin{algorithmic}[1]
+			\State Initialize $Z^{\mathrm{old}} = 0$ and create a decreasing grid $\lambda_1>\cdots > \lambda_n$
+			\For {each $k=1,\cdots , K,$ set $\lambda = \lambda_k$ and iterate until convergence:}
+			\State {Compute $\widehat{\mathbf{Z}}_{\lambda}\leftarrow S_{\lambda}(P_{\Omega}(\mathbf{Z} + P_{\Omega}^{\perp}(Z^{\mathrm{old}})))$.}
+            \State {Update $Z^{\mathrm{old}} \leftarrow \widehat{\mathbf{Z}}_{\lambda}$}
+			\EndFor
+            \State {Output the sequence of solutions $\widehat{\mathbf{Z}}_{\lambda_1},\cdots,\widehat{\mathbf{Z}}_{\lambda_K}$.}
+		\end{algorithmic}
+	\end{algorithm}
+
+Define the projection operator $P_{\Omega}:\mathbb{R}^{m\times n} \mapsto \mathbb{R}^{m\times n}$ as follows:
+\begin{equation}
+[P_{\Omega}(\mathbf{Z})]_{ij} = \begin{cases}
+z_{ij}  \qquad & \mathrm{if} \quad (i,j)\in\Omega\\
+0 \qquad & \mathrm{if} \quad (i,j) \notin \Omega
+\end{cases}
+\end{equation}
+
+Define the soft-thresholded version of SVD as:
+\begin{equation}
+S_{\lambda}(\mathbf{W}) \equiv \mathbf{UD_{\lambda}V^T} \quad \mathrm{where} \quad \mathbf{D_{\lambda}} = \mathrm{diag}[(d_1 - \lambda)_{+},\cdots,(d_r - \lambda)_{+}].
+\end{equation}
+
 	\section{Comparison of SVD implementations}
+We've got different functions of doing soft-impute implementations using 4 svd methods. Now we want to compare which of these methods is the fastest and which of these methods is the most accurate.
+
+First of all, we simulated several matrices using the underlying model:
+
+$$
+\mathbf{Z}_{m\times n} = \mathbf{U_{m\times  r}V^{T}_{r\times n} + \epsilon}
+$$
+
+Where $\mathbf{U}$ and $\mathbf{V}$ are random matrices with standard normal Gaussian entries, and $\epsilon $ is i.i.d. Guassian. $\Omega$ is uniformly random over the indices of the matrix with p $\%$ of missing entries.
+Define the SNR, test error and training error as:
+$$
+\textrm{SNR} = \sqrt{\frac{\mathrm{var}(UV^T)}{\mathrm{var}(\epsilon)}}
+$$
+$$
+\textrm{Test error} = \frac{\| P^{\perp}_{\Omega}(UV^T - \widehat{Z}) \|^2_F}{\| P^{\perp}_{\Omega}(UV^T) \|^2_F}
+$$
+$$
+\textrm{Training error} = \frac{\| P_{\Omega}(Z - \widehat{Z}) \|^2_F}{\| P_{\Omega}(Z) \|^2_F}
+$$
+
+In the following figures, we show the training and test error for the 4 methods as a function of rank.
+
+\begin{figure}[!htb]
+  \centering
+  \subfigure[Test error]{
+    \includegraphics[width=0.45\textwidth]{testerror.pdf}}
+~
+  \subfigure[Training error]{
+    \includegraphics[width=0.45\textwidth]{trainingerror.pdf}}
+  \caption{Compare the test error against the rank among the 4 methods with $p = 50\%, \mathrm{SNR} = 1, \textrm{true rank} = 10, m = n =100.$}\label{comparison_testerror}
+\end{figure}
+
+As we can see in the figures, the soft-impute using svd methods \verb|original svd| and \verb|rcpparmadillo| perform very similarly. While the method of \verb|irlba package| seems to have lowest Test error at some rank, but it seems fluctuate a lot. the methods \verb|original svd| and \verb|rcpparmadillo|. According to the training error, the method of \verb|irlba package| recovers a matrix with a relatively low rank which is closer to our true rank. So it has less evidence of overfitting.
+
+Then we tried different properties of the generated matrix. Let $p = 0.3,0.5,0.8 ;\textrm{SNR} = 1,10; \textrm{true rank} = 5,10,20.$,then we get the table that compares the running time and test error among the 4 methods.
+
+\begin{table}[!htp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+time1&time2&time3&time4&error1&error2&error3&error4&true rank&SNR&$p$\\
+\hline
+2.1650&2.5915&1.3096&1.7030&0.2592&0.2592&0.2592&0.2592&5&1&0.3\\
+\hline
+2.0902&2.6631&1.4791&1.6333&0.4338&0.4338&0.4339&0.4338&10&1&0.3\\
+\hline
+2.0032&2.7237&1.6506&1.5678&0.6502&0.6502&0.6506&0.6502&20&1&0.3\\
+\hline
+1.9709&1.9810&0.6514&1.5437&0.0046&0.0046&0.0046&0.0046&5&10&0.3\\
+\hline
+1.9875&1.9486&0.6748&1.5096&0.0113&0.0113&0.0111&0.0113&10&10&0.3\\
+\hline
+2.0435&1.9584&0.6629&1.5443&0.0443&0.0432&0.0312&0.0443&20&10&0.3\\
+\hline
+2.8228&2.8239&1.3798&2.2199&0.3492&0.3492&0.3492&0.3492&5&1&0.5\\
+\hline
+2.6000&2.8008&1.6049&2.0534&0.5798&0.5798&0.5798&0.5798&10&1&0.5\\
+\hline
+2.4068&2.5195&1.7681&1.8531&0.7970&0.7970&0.7970&0.7970&20&1&0.5\\
+\hline
+2.8192&2.8098&0.9243&2.2188&0.0097&0.0097&0.0097&0.0097&5&10&0.5\\
+\hline
+2.7298&2.7674&0.9625&2.1510&0.0319&0.0319&0.0306&0.0319&10&10&0.5\\
+\hline
+2.6173&2.6013&0.9362&2.0141&0.1913&0.1896&0.1488&0.1913&20&10&0.5\\
+\hline
+4.1483&4.1360&2.3177&3.2476&0.7382&0.7382&0.7382&0.7382&5&1&0.8\\
+\hline
+4.4981&4.4856&2.5795&3.5294&0.9040&0.9040&0.9040&0.9040&10&1&0.8\\
+\hline
+3.8848&3.8947&2.4525&3.0592&0.9829&0.9829&0.9829&0.9829&20&1&0.8\\
+\hline
+3.9987&3.9948&1.5107&3.1125&0.1739&0.1739&0.1746&0.1739&5&10&0.8\\
+\hline
+4.1852&4.1783&1.9447&3.2685&0.5261&0.5261&0.5259&0.5261&10&10&0.8\\
+\hline
+4.6070&4.5803&2.4109&3.6193&0.8458&0.8458&0.8458&0.8458&20&10&0.8\\
+\hline
+\end{tabular}
+\caption{Performance of different methods for different problem instances, in terms of test error and running time.}
+\end{table}
+
+This table shows that the minimum test errors among the 4 methods are quite similar, but the running time of method \verb|irlba package| is the shortest followed by \verb|rcpparmadillo|.
+
+According to the comparison above, we'll use the method \verb|irlba package| in our application part, because it's the fastest one and in the figure it turns out to have minimum test error. We'll also use \verb|rcpparmadillo|, because it's also very fast and is more stable in the figure.
+
 	\section{Application}
 	\subsection{Lena}
 	Based the comparison between these 4 implementations, we choose the \verb|original svd| in R to do the image imputing. The reason is that from {\color{red}Figure} we can see the \verb|original svd| and \verb|rcpparmadillo| seems to be more steady than \verb|irlba| (the gray region that represents confidence interval is smaller). Also these two methods seems to have smaller test error around the true matrix rank. Because the data for lena is not large, thus we do not care about the speed of implementations. And we can expect \verb|original svd| and \verb|rcpparmadillo| would give almost the same results from the comparison part, hence we choose to use \verb|orginal svd|. 
